@@ -3,6 +3,10 @@
 USER_ID=$(id -u)
 LOG_FOLDER="/var/log/shell-roboshop"
 LOG_FILE="$LOG_FOLDER/$0.log"
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+N="\e[0m"
 
 mkdir -p $LOG_FOLDER
 
@@ -13,10 +17,10 @@ fi
 
 VALIDATE(){
     if [ $1 -ne 0 ]; then
-      echo "$2: FAILURE"
+      echo -e "$2: $R FAILURE $N" | tee -a $LOG_FILE
       exit 1
     else
-      echo "$2: Success"
+      echo -e "$2: $G Success $N" | tee -a $LOG_FILE
     fi
 }
 
