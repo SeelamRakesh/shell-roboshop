@@ -21,11 +21,13 @@ VALIDATE(){
       echo -e "$2: $R FAILURE $N" >> $LOG_FILE
       exit 1
     else
-      echo -e "$2: $R Success $N" >> $LOG_FILE
+      echo -e "$2: $G Success $N" >> $LOG_FILE
     fi
 }
 
 dnf module disable nginx -y >> $LOG_FILE
+VALIDATE $? "Disabling nginx"
+
 dnf module enable nginx:1.24 -y >> $LOG_FILE
 VALIDATE $? "Enabling nginx"
 
