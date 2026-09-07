@@ -2,7 +2,7 @@
 
 USER_ID=$(id -u)
 LOG_FOLDER="/var/log/$PWD"
-LOG_FOLDER="$LOG_FOLDER/$0.log"
+LOG_FILE="$LOG_FOLDER/$0.log"
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
@@ -15,16 +15,16 @@ fi
 
 VALIDATE() {
   if [ $1 -ne 0 ]; then
-   echo -e "$2 $R Failure $N"
+   echo -e "$2 $R Failure $N" | tee -a $LOG_FILE
   else 
-   echo -e "$2 $G Success $N"
+   echo -e "$2 $G Success $N" | tee -a $LOG_FILE
   fi
 }
 
-cp $PWD/mongo.repo /etc/yum.repos.d/mongo.repo
+cp $PWD/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOG_FILE
 VALIDATE $? "Copying Mongo repo"
 
-dnf install mongodb-org -y
+dnf install mongodb-org -y &>> $LOG_FILE
 VALIDATE $? "installing mongodb" 
 
 systemctl enable mongod 
