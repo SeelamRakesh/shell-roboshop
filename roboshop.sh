@@ -5,12 +5,23 @@ SG_ID="sg-0e17db6ab1dfaa76a"
 
 for instance in $@
 do
-    aws ec2 run-instances \
-        --image-id $AMI_ID \
-        --instance-type t3.micro \
-        --security-group-ids $SG_ID \
-        --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=$instance}]' \
-        --query 'Instances[0].PrivateIpAddress' \
+    INSTANCE_ID=(aws ec2 run-instances \
+            --image-id $AMI_ID \
+            --instance-type t3.micro \
+            --security-group-ids $SG_ID \
+            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
+            --query 'Instances[0].PrivateIpAddress' \
+            --output text)
+    if [ $instance == "frontend" ]; then
+      aws ec2 describe-instances \
+        --instance-ids $INSTANCE_ID \
+        --query "Reservations[*].Instances[*].PublicIpAddress" \
         --output text
+    else
+      aws ec2 describe-instances \
+        --instance-ids $INSTANCE_ID \
+        --query "Reservations[*].Instances[*].PrivateIpAddress" \
+        --output text
+    fi
 done
 
