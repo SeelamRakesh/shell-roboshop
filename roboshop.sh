@@ -15,7 +15,7 @@ do
     if [ $instance == "frontend" ]; then
      aws ec2 describe-instances \
         --instance-ids $INSTANCE_ID \
-        --query "Reservations[].Instances[].PublicIpAddress" \
+        --query 'Reservations[].Instances[].PublicIpAddress' \
         --output text
     else
       aws ec2 describe-instances \
@@ -24,4 +24,3 @@ do
         --output text
     fi
 done
-
