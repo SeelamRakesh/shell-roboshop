@@ -1,6 +1,10 @@
 #!/bin/bash
 
 USER_ID=$(id -u)
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+N="\e[0m"
 LOG_FOLDER="/var/log/shell-roboshop"
 LOG_FILE="$LOG_FOLDER/$0.log"
 SCRIPT_DIR=$PWD
@@ -14,10 +18,32 @@ fi
 
 VALIDATE(){
     if [ $1 -ne 0 ]; then
-      echo "$2: FAILURE"
+      echo -e "$2: $R FAILURE $N"
       exit 1
     else
-      echo "$2: Success"
+      echo "$2: $R Success $N"
     fi
 }
 
+dnf module disable nginx -y
+dnf module enable nginx:1.24 -y
+VALIDATE $? "Enabling nginx"
+
+dnf install nginx -y
+VALIDATE $? "Installing nginx"
+
+rm -rf /usr/share/nginx/html/* 
+VALIDATE $? "Removing default content"
+
+curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+VALIDATE $? "Downloading frontend code"
+
+cd /usr/share/nginx/html 
+unzip /tmp/frontend.zip
+VALIDATE $? "Unzipping frontend code"
+
+cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
+VALIDATE $? "Enabling reverse proxy"
+
+systemctl restart nginx 
+VALIDATE $? "Restarting Nginx"
