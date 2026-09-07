@@ -18,34 +18,34 @@ fi
 
 VALIDATE(){
     if [ $1 -ne 0 ]; then
-      echo -e "$2: $R FAILURE $N" >> $LOG_FILE
+      echo -e "$2: $R FAILURE $N" &>> $LOG_FILE
       exit 1
     else
-      echo -e "$2: $G Success $N" >> $LOG_FILE
+      echo -e "$2: $G Success $N" &>> $LOG_FILE
     fi
 }
 
-dnf module disable nginx -y >> $LOG_FILE
+dnf module disable nginx -y &>> $LOG_FILE
 VALIDATE $? "Disabling nginx"
 
-dnf module enable nginx:1.24 -y >> $LOG_FILE
+dnf module enable nginx:1.24 -y &>> $LOG_FILE
 VALIDATE $? "Enabling nginx"
 
-dnf install nginx -y >> $LOG_FILE
+dnf install nginx -y &>> $LOG_FILE
 VALIDATE $? "Installing nginx"
 
-systemctl enable nginx >> $LOG_FILE
+systemctl enable nginx &>> $LOG_FILE
 systemctl start nginx 
 VALIDATE $? "Enabling and Starting nginx"
 
 rm -rf /usr/share/nginx/html/* 
 VALIDATE $? "Removing default content"
 
-curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip >> $LOG_FILE
+curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip &>> $LOG_FILE
 VALIDATE $? "Downloading frontend code"
 
 cd /usr/share/nginx/html 
-unzip /tmp/frontend.zip >> $LOG_FILE
+unzip /tmp/frontend.zip &>> $LOG_FILE
 VALIDATE $? "Unzipping frontend code"
 
 cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
