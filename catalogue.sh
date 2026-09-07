@@ -45,3 +45,38 @@ fi
 
 mkdir -p /app 
 VALIDATE $? "Creating directory"
+
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
+VALIDATE $? "downloading catalogue code"
+
+cd /app 
+unzip /tmp/catalogue.zip &>> $LOG_FILE
+VALIDATE $? "Unzipping catalogue code in app directory"
+
+npm install &>> $LOG_FILE
+VALIDATE $? "Installing dependencies"
+
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
+VALIDATE $? "Copying catalogue service"
+
+systemctl daemon-reload
+systemctl enable catalogue &>> $LOG_FILE
+systemctl start catalogue
+VALIDATE $? "Enabling and Starting catalogue"
+
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
+VALIDATE $? "Copying mongo repo"
+
+dnf install mongodb-mongosh -y &>> $LOG_FILE
+VALIDATE $? "installing mongodb" 
+
+INDEX=$(mongosh --host $MONGODB_HOST --quiet  --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+if [ $INDEX -le 0 ]; then
+   mongosh --host MONGODB-SERVER-IPADDRESS </app/db/master-data.js &>> $LOG_FILE
+   VALIDATE $? "loading products"
+else 
+   echo -e "Procuts already loaded $Y SKIPPING $N" 
+fi
+
+systemctl restart catalogue
+VALIDATE $? "Restarting catalogue"
