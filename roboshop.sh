@@ -31,7 +31,6 @@ do
 
     aws route53 change-resource-record-sets \
     --hosted-zone-id $ZONE_ID \
-    {
     "Comment": "Creating a new A record",
     "Changes": [
         {
@@ -46,7 +45,5 @@ do
             }
             ]
         }
-        }
     ]
-    }
 done
