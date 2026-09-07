@@ -26,3 +26,17 @@ VALIDATE(){
     fi
 }
 
+dnf module disable nodejs -y
+VALIDATE $? "Disabling nodejs"
+
+dnf module enable nodejs:20 -y
+VALIDATE $? "Enabling nodejs:20"
+
+dnf install nodejs -y
+VALIDATE $? "Installing nodejs:20"
+
+useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+VALIDATE $? "Creating system user"
+
+mkdir -p /app 
+VALIDATE $? "Creating directory"
