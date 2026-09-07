@@ -1,4 +1,4 @@
-#! bin/bash
+#!/bin/bash
 
 AMI_ID="ami-0220d79f3f480ecf5"
 SG_ID="sg-0e17db6ab1dfaa76a"
@@ -32,23 +32,23 @@ do
     aws route53 change-resource-record-sets \
     --hosted-zone-id $ZONE_ID \
     --change-batch '
-        {
+    {
         "Comment": "Creating a new A record",
         "Changes": [
             {
             "Action": "CREATE",
             "ResourceRecordSet": {
-                "Name": $DOMAIN,
+                "Name": "'$RECORD_NAME'",
                 "Type": "A",
                 "TTL": 300,
                 "ResourceRecords": [
                 {
-                    "Value": $IP
+                    "Value": "'$IP'"
                 }
                 ]
             }
             }
         ]
-        }
+    }
     '
 done
