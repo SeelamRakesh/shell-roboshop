@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USER_ID=$(id -u)
-LOG_FOLDER="/var/log/$PWD"
+LOG_FOLDER="/var/log/shell-roboshop"
 LOG_FILE="$LOG_FOLDER/$0.log"
 R="\e[31m"
 G="\e[32m"
@@ -12,6 +12,8 @@ if [ $USER_ID -ne 0 ]; then
  echo "Run the script as Root User"
  exit 1
 fi
+
+mkdir -p $LOG_FOLDER
 
 VALIDATE() {
   if [ $1 -ne 0 ]; then
