@@ -16,13 +16,13 @@ do
     --output text)
  if [ instance == "frontend"]; then
    IP=$(aws ec2 describe-instances \
-    --instance-ids i-0123456789abcdef0 \
+    --instance-ids $INSTANCE_ID \
     --query "Reservations[].Instances[].PublilcIpAddress" \
     --output text)
     RECORD_NAME=$DOMAIN #rakesh.bond
  else
    IP=$(aws ec2 describe-instances \
-    --instance-ids i-0123456789abcdef0 \
+    --instance-ids $INSTANCE_ID \
     --query "Reservations[].Instances[].PrivateIpAddress" \
     --output text)
     RECORD_NAME="$instance.$DOMAIN" #rakesh.bond
