@@ -31,23 +31,23 @@ do
  aws route53 change-resource-record-sets \
     --hosted-zone-id $ZONE_ID \
     --change-batch '
-        {
-    "Comment": "Creating a new A record",
-    "Changes": [
-        {
-        "Action": "CREATE",
-        "ResourceRecordSet": {
-            "Name": $DOMAIN,
-            "Type": "A",
-            "TTL": 300,
-            "ResourceRecords": [
+    {
+        "Comment": "Creating a new A record",
+        "Changes": [
             {
-                "Value": $IP
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": $DOMAIN,
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                {
+                    "Value": $IP
+                }
+                ]
             }
-            ]
-        }
-        }
-    ]
+            }
+        ]
     }
     '
 done
