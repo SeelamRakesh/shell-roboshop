@@ -26,49 +26,60 @@ VALIDATE(){
     fi
 }
 
-dnf list installed | grep nodejs &>>$LOG_FILE
-if [ $? -ne 0 ]; then
-    dnf module disable nodejs -y &>>$LOG_FILE
-    dnf module enable nodejs:20 -y &>>$LOG_FILE
-    VALIDATE $? "Enabling nodejs-20"
+dnf module disable nodejs -y &>> $LOG_FILE
+VALIDATE $? "Disabling nodejs"
 
-    dnf install nodejs -y &>>$LOG_FILE
-    VALIDATE $? "Installing nodejs"
-else
-    echo -e "Nodejs already installed $Y SKIPPING $N"
-fi
+dnf module enable nodejs:20 -y &>> $LOG_FILE
+VALIDATE $? "Enabling nodejs:20"
 
-id roboshop &>>$LOG_FILE
+dnf install nodejs -y &>> $LOG_FILE
+VALIDATE $? "Installing nodejs:20"
+
+id roboshop
 if [ $? -ne 0 ]; then
-  useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+  useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
   VALIDATE $? "Creating system user"
 else
-  echo -e "User already exist $Y SKIPPING $N"
+  echo -e "Roboshop user already exists $Y SKIPPING $N"
 fi
 
-mkdir -p /app
-VALIDATE $? "Creating App Directory"
+mkdir -p /app 
+VALIDATE $? "Creating directory"
 
-curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip &>>$LOG_FILE
+curl -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip &>> $LOG_FILE
+VALIDATE $? "downloading user code"
+
 cd /app 
-VALIDATE $? "Downloading User Code"
-
 rm -rf /app/*
-VALIDATE $? "Removing existing code"
+VALIDATE $? "Moving to app direcotry and deleting existing code"
 
-unzip /tmp/user.zip &>>$LOG_FILE
-VALIDATE $? "Downloading and Unzipping user"
+unzip /tmp/user.zip &>> $LOG_FILE
+VALIDATE $? "Unzipping user code in app directory"
 
-cd /app 
-npm install &>>$LOG_FILE
-VALIDATE $? "Installing Dependencies"
+npm install &>> $LOG_FILE
+VALIDATE $? "Installing dependencies"
 
 cp $SCRIPT_DIR/user.service /etc/systemd/system/user.service
-VALIDATE $? "Copying user.service"
+VALIDATE $? "Copying user service"
 
 systemctl daemon-reload
-VALIDATE $? "Reloading Daemon"
-
-systemctl enable user &>>$LOG_FILE
+systemctl enable user &>> $LOG_FILE
 systemctl start user
-VALIDATE $? "Enabling and Starting User"
+VALIDATE $? "Enabling and Starting user"
+
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
+VALIDATE $? "Copying mongo repo"
+
+dnf install mongodb-mongosh -y &>> $LOG_FILE
+VALIDATE $? "installing mongodb" 
+
+INDEX=$(mongosh --host $MONGODB_HOST --quiet  --eval 'db.getMongo().getDBNames().indexOf("user")')
+if [ $INDEX -le 0 ]; then
+   mongosh --host $MONGODB_HOST </app/db/master-data.js &>> $LOG_FILE
+   VALIDATE $? "loading products"
+else 
+   echo -e "Procuts already loaded $Y SKIPPING $N" 
+fi
+
+systemctl restart user
+VALIDATE $? "Restarting user"
