@@ -8,7 +8,7 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 SCRIPT_DIR=$PWD
-MYSQL_HOST=mysql.rakesh.bond
+MYSQL_HOST="mysql.rakesh.bond"
 
 mkdir -p $LOG_FOLDER
 
