@@ -20,7 +20,6 @@ do
     --query 'Reservations[].Instances[].PublilcIpAddress' \
     --output text)
     RECORD_NAME=$DOMAIN #rakesh.bond
-
  else
    IP=$(aws ec2 describe-instances \
     --instance-ids $INSTANCE_ID \
@@ -28,9 +27,10 @@ do
     --output text)
     RECORD_NAME="$instance.$DOMAIN" #rakesh.bond
  fi
+
  aws route53 change-resource-record-sets \
     --hosted-zone-id $ZONE_ID \
-    --change-batch'
+    --change-batch '
         {
     "Comment": "Creating a new A record",
     "Changes": [
