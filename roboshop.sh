@@ -25,7 +25,7 @@ do
     --instance-ids $INSTANCE_ID \
     --query 'Reservations[].Instances[].PrivateIpAddress' \
     --output text)
-    RECORD_NAME="$instance.$DOMAIN" #rakesh.bond
+   RECORD_NAME="$instance.$DOMAIN" #rakesh.bond
  fi
 
  aws route53 change-resource-record-sets \
@@ -37,12 +37,12 @@ do
             {
             "Action": "CREATE",
             "ResourceRecordSet": {
-                "Name": "$RECORD_NAME",
+                "Name": $RECORD_NAME,
                 "Type": "A",
                 "TTL": 300,
                 "ResourceRecords": [
                 {
-                    "Value": "$IP"
+                    "Value": $IP
                 }
                 ]
             }
