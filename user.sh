@@ -66,20 +66,3 @@ systemctl daemon-reload
 systemctl enable user &>> $LOG_FILE
 systemctl start user
 VALIDATE $? "Enabling and Starting user"
-
-cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
-VALIDATE $? "Copying mongo repo"
-
-dnf install mongodb-mongosh -y &>> $LOG_FILE
-VALIDATE $? "installing mongodb" 
-
-INDEX=$(mongosh --host $MONGODB_HOST --quiet  --eval 'db.getMongo().getDBNames().indexOf("user")')
-if [ $INDEX -le 0 ]; then
-   mongosh --host $MONGODB_HOST </app/db/master-data.js &>> $LOG_FILE
-   VALIDATE $? "loading products"
-else 
-   echo -e "Procuts already loaded $Y SKIPPING $N" 
-fi
-
-systemctl restart user
-VALIDATE $? "Restarting user"
